@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard - SmartCare Hospital</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .search-box {
+            margin: 20px auto;
+            text-align: center;
+        }
+        .search-box input {
+            padding: 10px;
+            width: 300px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+        }
+        .filter-buttons {
+            text-align: center;
+            margin: 15px 0;
+        }
+        .filter-btn {
+            background: #1a3a5c;
+            color: white;
+            border: none;
+            padding: 5px 15px;
+            margin: 0 5px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .filter-btn:hover {
+            background: #0e2a45;
+        }
+    </style>
+</head>
+
+<body class="dashboard-bg">
+
+<div class="content-wrapper">
+    
+    <div class="top-bar">
+        <h2 class="title">👨‍💼 Admin Dashboard</h2>
+        <div class="user-info">
+            <span>Welcome, {{ name }}</span>
+            <a href="/logout" class="logout-btn">🚪 Logout</a>
+        </div>
+    </div>
+
+    <div class="admin-container">
+        <div class="patient-list-card">
+            <h3>📋 Patient Records</h3>
+            <p class="info-text">Click on any Patient ID to view complete details</p>
+            
+            <!-- Search Box -->
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="🔍 Search Patient ID..." onkeyup="filterPatients()">
+            </div>
+            
+            <!-- Filter Buttons -->
+            <div class="filter-buttons">
+                <button class="filter-btn" onclick="showAll()">All</button>
+                <button class="filter-btn" onclick="showCritical()">Show Critical Only</button>
+            </div>
+            
+            {% if patient_ids %}
+                <div class="patient-grid" id="patientGrid">
+                    {% for pid in patient_ids %}
+                        <a href="/patient/{{ pid }}" class="patient-id-card" data-patient-id="{{ pid }}">
+                            <div class="patient-id">🩺 Patient ID: {{ pid }}</div>
+                            <div class="view-details">Click to view →</div>
+                        </a>
+                    {% endfor %}
+                </div>
+                
+                <div class="total-count" id="totalCount">
+                    Total Patients: {{ patient_ids|length }}
+                </div>
+            {% else %}
+                <div class="no-data">
+                    <h3>⚠️ No Patient Data Found!</h3>
+                    <p>Please check that patients.csv exists in the project folder.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+</div>
+
+<script>
+    function filterPatients() {
+        let input = document.getElementById('searchInput');
+        let filter = input.value.toLowerCase();
+        let grid = document.getElementById('patientGrid');
+        let cards = grid.getElementsByClassName('patient-id-card');
+        let visibleCount = 0;
+        
+        for (let i = 0; i < cards.length; i++) {
+            let patientId = cards[i].getAttribute('data-patient-id');
+            if (patientId.toLowerCase().includes(filter)) {
+                cards[i].style.display = "";
+                visibleCount++;
+            } else {
+                cards[i].style.display = "none";
+            }
+        }
+        
+        document.getElementById('totalCount').innerHTML = `Showing ${visibleCount} of {{ patient_ids|length }} Patients`;
+    }
+    
+    function showAll() {
+        document.getElementById('searchInput').value = '';
+        filterPatients();
+    }
+    
+    function showCritical() {
+        // This would require fetching critical status from backend
+        // For now, just a placeholder
+        alert('Critical filter would need API integration');
+    }
+</script>
+
+</body>
+</html>

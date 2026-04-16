@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ICU Monitoring</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial;
+            background: url('static/hospital2.jpg') no-repeat center center fixed;
+            background-size: cover;
+        }
+
+        .overlay {
+            background: rgba(0,0,0,0.5);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .top-bar {
+            text-align: center;
+            color: white;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            width: 120px;
+            text-align: center;
+        }
+
+        .critical { color: red; }
+        .unstable { color: orange; }
+        .watching { color: gold; }
+
+        .center-container {
+            margin-top: 40px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .patient-box {
+            background: rgba(255,255,255,0.95);
+            padding: 20px;
+            border-radius: 15px;
+            width: 400px;
+            text-align: center;
+        }
+
+        .btn {
+            margin-top: 10px;
+            padding: 8px;
+            width: 100%;
+            background: #1a3a5c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div class="overlay">
+
+    <div class="top-bar">
+        <h2>🧑‍⚕️ ICU Live Monitoring</h2>
+        <p>Welcome, {{ name }}</p>
+        <a href="/logout" style="color:white;">Logout</a>
+    </div>
+
+    <div class="stats">
+        <div class="card">
+            🚨 <h2 id="criticalCount" class="critical">0</h2> Critical
+        </div>
+        <div class="card">
+            ⚠️ <h2 id="unstableCount" class="unstable">0</h2> Unstable
+        </div>
+        <div class="card">
+            👁️ <h2 id="watchingCount" class="watching">0</h2> Watching
+        </div>
+    </div>
+
+    <div class="center-container">
+        <div id="mainPatient" class="patient-box">
+            Loading...
+        </div>
+    </div>
+
+</div>
+
+<script>
+
+function fetchData() {
+    fetch('/api/unstable_patients')
+    .then(res => res.json())
+    .then(data => {
+
+        let critical = 0, unstable = 0, watching = 0;
+
+        data.forEach(p => {
+            if (p.status === "CRITICAL") critical++;
+            else if (p.status === "UNSTABLE") unstable++;
+            else if (p.status === "WATCHING") watching++;
+        });
+
+        document.getElementById("criticalCount").innerText = critical;
+        document.getElementById("unstableCount").innerText = unstable;
+        document.getElementById("watchingCount").innerText = watching;
+
+        const main = document.getElementById("mainPatient");
+
+        let html = "";
+
+        // 🔥 SHOW TOP 2 PATIENTS
+        for (let i = 0; i < Math.min(2, data.length); i++) {
+            const p = data[i];
+
+            html += `
+                <div style="margin-bottom:20px;">
+                    <h3>🚨 ${p.status} - Patient ${p.id}</h3>
+                    <p>❤️ ${p.heart_rate} bpm</p>
+                    <p>🫁 ${p.spo2}%</p>
+                    <p>📊 Risk: ${p.risk_score}%</p>
+                    <button class="btn" onclick="viewPatient(${p.id})">
+                        View Full Details →
+                    </button>
+                </div>
+            `;
+        }
+
+        main.innerHTML = html;
+
+    });
+}
+
+function viewPatient(id) {
+    window.location.href = "/patient/" + id;
+}
+
+// 🔥 REFRESH EVERY 20 SECONDS
+setInterval(fetchData, 20000);
+fetchData();
+
+</script>
+
+</body>
+</html>

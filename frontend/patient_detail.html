@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Patient Details - SmartCare Hospital</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body class="dashboard-bg">
+
+<div class="content-wrapper">
+    
+    <div class="top-bar">
+        <h2 class="title">📋 Patient Clinical Data</h2>
+        <div class="user-info">
+            <span>Welcome, {{ name }}</span>
+            <a href="/logout" class="logout-btn">🚪 Logout</a>
+        </div>
+    </div>
+
+    <div class="detail-container">
+        <div class="detail-card">
+            
+            <!-- Risk Level Banner -->
+            <div class="risk-banner risk-{{ patient._risk_level|lower }}">
+                🩺 RISK LEVEL: {{ patient._risk_level }}
+            </div>
+            
+            <h3>📊 Essential Clinical Features for Deterioration Prediction</h3>
+            
+            <div class="details-grid">
+                {% for key, value in patient.items() %}
+                    {% if not key.startswith('_') %}
+                        <div class="detail-row">
+                            <div class="detail-label">
+                                {% if patient._display_names and key in patient._display_names %}
+                                    {{ patient._display_names[key] }}
+                                {% else %}
+                                    {{ key | replace('_', ' ') | title }}
+                                {% endif %}:
+                            </div>
+                            <div class="detail-value">
+                                {% if value is none or value == '' %}
+                                    <span class="na-value">N/A</span>
+                                {% elif key == 'deterioration_next_12h' %}
+                                    {% if value == 1 %}
+                                        <span class="high-risk-value">⚠️ HIGH - Deterioration Expected</span>
+                                    {% else %}
+                                        <span class="low-risk-value">✅ Stable - No Deterioration Expected</span>
+                                    {% endif %}
+                                {% elif key == 'gender_x' %}
+                                    {% if value == 1 %}Male{% elif value == 2 %}Female{% else %}{{ value }}{% endif %}
+                                {% else %}
+                                    {{ value }}
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            
+            <div class="clinical-note">
+                <h4>📌 Clinical Interpretation</h4>
+                <ul>
+                    {% if patient.spo2_pct_x and patient.spo2_pct_x < 92 %}
+                        <li class="warning">⚠️ Low oxygen saturation ({{ patient.spo2_pct_x }}%) - Monitor closely</li>
+                    {% endif %}
+                    {% if patient.heart_rate_x and patient.heart_rate_x > 100 %}
+                        <li class="warning">⚠️ Elevated heart rate ({{ patient.heart_rate_x }} bpm) - Possible stress</li>
+                    {% endif %}
+                    {% if patient.lactate_x and patient.lactate_x > 2 %}
+                        <li class="warning">⚠️ Elevated lactate ({{ patient.lactate_x }} mmol/L) - Sepsis risk</li>
+                    {% endif %}
+                    {% if patient.sepsis_risk_score_x and patient.sepsis_risk_score_x > 0.5 %}
+                        <li class="warning">⚠️ High sepsis risk score ({{ patient.sepsis_risk_score_x }})</li>
+                    {% endif %}
+                </ul>
+            </div>
+            
+            <div class="back-button">
+                <a href="/admin" class="back-link-btn">← Back to Patient List</a>
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+</body>
+</html>

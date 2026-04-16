@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Manage Users - SmartCare Hospital</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body class="dashboard-bg">
+
+<div class="content-wrapper">
+    
+    <div class="top-bar">
+        <h2 class="title">👨‍💼 User Management</h2>
+        <div class="user-info">
+            <span>Welcome, {{ name }}</span>
+            <a href="/logout" class="logout-btn">🚪 Logout</a>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Name</th>
+                <th>Department</th>
+            </tr>
+
+            {% for user in users %}
+            <tr>
+                <td>{{ user[0] }}</td>
+                <td>{{ user[1] }}</td>
+                <td>{{ user[2] }}</td>
+                <td>{{ user[3] }}</td>
+                <td>{{ user[4] or '-' }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    
+    <div class="back-link">
+        <a href="/admin">← Back to Admin Dashboard</a>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SmartCare Hospital - Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body class="login-bg">
+
+<div class="login-wrapper">
+    <div class="login-box">
+
+        <div class="hospital-header">
+            <h1>🏥 SMARTCARE HOSPITAL</h1>
+            <p class="version">CLOUD ICU SYSTEM</p>
+            <p class="powered">powered by AI Health Solutions</p>
+        </div>
+
+        <div class="login-title">
+            <h2>LOGIN</h2>
+        </div>
+
+        {% if error %}
+            <div class="error-message" style="background:#fee;color:#c00;padding:10px;margin-bottom:15px;border-radius:5px;">
+                ⚠️ {{ error }}
+            </div>
+        {% endif %}
+
+        <form method="POST" action="/login">
+
+            <div class="input-group">
+                <label>Email:</label>
+                <input type="email" name="username" placeholder="Enter registered email" required>
+            </div>
+
+            <div class="input-group">
+                <label>Password:</label>
+                <input type="password" name="password" placeholder="Enter password" required>
+            </div>
+
+            <div class="input-group">
+                <label>Role:</label>
+                <select name="role">
+                    <option value="admin">Admin</option>
+                    <option value="doctor">Doctor</option>
+                </select>
+            </div>
+
+            <button type="submit">SUBMIT</button>
+
+        </form>
+
+        <div class="login-footer" style="text-align:center;margin-top:20px;font-size:12px;color:#888;">
+            Authorized Access Only
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>
